@@ -11,6 +11,7 @@ class _VisitaFormPageState extends State<VisitaFormPage> {
   final formKey = GlobalKey<FormState>();
   final responsavelController = TextEditingController();
   final quantidadeController = TextEditingController();
+  String? selectedGroupType;
 
   void saveForm() {
     final isValid = formKey.currentState!.validate();
@@ -48,9 +49,28 @@ class _VisitaFormPageState extends State<VisitaFormPage> {
                     prefixIcon: Icon(Icons.person),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Informe o nome do responsável';
-                    }
+                    if (value == null || value.isEmpty) return 'Informe o nome do responsável';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Tipo de grupo',
+                    helperText: 'Selecione a categoria do grupo visitante',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.group),
+                  ),
+                  value: selectedGroupType,
+                  items: const [
+                    DropdownMenuItem(value: 'Escolar', child: Text('Escolar')),
+                    DropdownMenuItem(value: 'Universitário', child: Text('Universitário')),
+                    DropdownMenuItem(value: 'Turistas', child: Text('Turistas')),
+                    DropdownMenuItem(value: 'Outros', child: Text('Outros')),
+                  ],
+                  onChanged: (value) => setState(() => selectedGroupType = value),
+                  validator: (value) {
+                    if (value == null) return 'Selecione o tipo de grupo';
                     return null;
                   },
                 ),
