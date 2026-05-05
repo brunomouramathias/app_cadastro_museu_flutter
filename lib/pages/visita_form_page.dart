@@ -12,13 +12,44 @@ class _VisitaFormPageState extends State<VisitaFormPage> {
   final responsavelController = TextEditingController();
   final quantidadeController = TextEditingController();
   String? selectedGroupType;
+  bool needsGuide = false;
+  bool acceptedTerms = false;
 
   void saveForm() {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
+    final guia = needsGuide ? 'Sim' : 'Não';
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Formulário válido!')),
+      const SnackBar(content: Text('Cadastro realizado!')),
     );
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Dados da Visita'),
+        content: Text(
+          'Responsável: \${responsavelController.text}\n'
+          'Tipo de grupo: \$selectedGroupType\n'
+          'Quantidade de pessoas: \${quantidadeController.text}\n'
+          'Necessita de guia: \$guia',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void clearForm() {
+    responsavelController.clear();
+    quantidadeController.clear();
+    setState(() {
+      selectedGroupType = null;
+      needsGuide = false;
+      acceptedTerms = false;
+    });
   }
 
   @override
@@ -88,15 +119,37 @@ class _VisitaFormPageState extends State<VisitaFormPage> {
                     if (value == null || value.isEmpty) return 'Informe a quantidade';
                     final qtd = int.tryParse(value);
                     if (qtd == null) return 'Informe um número válido';
-                    if (qtd <= 0) return 'A quantidade deve ser maior que zero';
+                    if (qtd == 0) return 'A quantidade deve ser maior que zero';
+                    if (qtd < 0) return 'A quantidade não pode ser negativa';
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('Guia exclusivo'),
+                  subtitle: const Text('Solicitar acompanhamento de um guia do museu'),
+                  value: needsGuide,
+                  activeColor: Colors.blue,
+                  tileColor: needsGuide ? Colors.blue.withOpacity(0.08) : null,
+                  onChanged: (value) => setState(() => needsGuide = value),
+                ),
+                const SizedBox(height: 8),
+                CheckboxListTile(
+                  title: const Text('Concordo com as regras de visitação'),
+                  subtitle: const Text('Comprometo-me a zelar pelas obras expostas'),
+                  value: acceptedTerms,
+                  onChanged: (value) => setState(() => acceptedTerms = value ?? false),
+                ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
-                  onPressed: saveForm,
+                  onPressed: acceptedTerms ? saveForm : null,
                   icon: const Icon(Icons.save),
                   label: const Text('Salvar cadastro'),
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton(
+                  onPressed: clearForm,
+                  child: const Text('Limpar formulário'),
                 ),
               ],
             ),
