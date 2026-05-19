@@ -1,0 +1,1 @@
+ C:\\Users\\BRUNO\\Desktop\\Trabalho\ Proprio\\UTFPR\\Disciplinas\\COM1021_Mobile\\cadastro_museu\\build\\4c43c44995a54efaa4efc14785e419d7\\dart_build_result.json: 
